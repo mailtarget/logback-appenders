@@ -27,3 +27,5 @@ add this project as dependency of your project
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
+
+to see configuration sample please take a look at "xml" folder above
