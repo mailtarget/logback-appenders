@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="SLACK" class="com.masasdani.logbacktest.SlackAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <webhookUri>{your-webhook-url-here}</webhookUri>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{32} - %msg%n</pattern>
+        </layout>
+        <username>logbacktest</username>
+        <emoji>:see_no_evil</emoji>
+        <emoji>channel</emoji>
+    </appender>
+
+    <appender name="ASYNC_SLACK" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="SLACK" />
+    </appender>
+
+    <root level="error">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ASYNC_SLACK" />
+    </root>
+
+</configuration>
