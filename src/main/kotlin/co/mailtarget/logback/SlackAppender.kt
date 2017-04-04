@@ -13,10 +13,12 @@ import java.net.URLEncoder
 import java.util.*
 
 /**
-*
-* @author masasdani
-* @since 3/18/17
-*/
+ *
+ * Enabled push notitication to slack channel
+ *
+ * @author masasdani
+ * @since 3/18/17
+ */
 class SlackAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
     var webhookUri: String? = null
