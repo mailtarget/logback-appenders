@@ -15,16 +15,12 @@ Prerequisites:
 Usage
 =====
 
-clone and install this project to your system
-
-        mvn clean install
-
 add this project as dependency of your project
 
 	    <dependency>
             <groupId>co.mailtarget</groupId>
             <artifactId>logback-appenders</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.2</version>
         </dependency>
 
 
