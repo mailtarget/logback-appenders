@@ -4,7 +4,7 @@
 
     <groupId>co.mailtarget</groupId>
     <artifactId>logback-appenders</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
 
     <name>co.mailtarget:logback-appenders</name>
     <description>Collections of custom appenders utility to distribute logback's event.</description>
