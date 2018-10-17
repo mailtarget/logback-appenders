@@ -20,7 +20,7 @@ add this project as dependency of your project
 	    <dependency>
             <groupId>co.mailtarget</groupId>
             <artifactId>logback-appenders</artifactId>
-            <version>0.0.2</version>
+            <version>0.0.4</version>
         </dependency>
 
 
