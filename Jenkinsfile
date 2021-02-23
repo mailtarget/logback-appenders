@@ -6,7 +6,8 @@ pipeline {
     }
   }
   options {
-        copyArtifactPermission('../mtarget-backend/*');
+        copyArtifactPermission('../mtarget-backend*');
+        
     }
   stages {
     stage('Build') {
