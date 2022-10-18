@@ -76,4 +76,16 @@ class SentryAppenderTest {
         println("event $event")
         sentryAppender.sendMessage(event)
     }
+
+    @Test
+    fun `should not send message because log info`() {
+        val event = LoggingEvent()
+        event.message = """
+            Info Aja Sih
+        """.trimIndent()
+        event.level = Level.INFO
+        event.loggerName = "api-gateway-v2-55bd64db5c-4tc9q"
+        println("event $event")
+        sentryAppender.sendMessage(event)
+    }
 }

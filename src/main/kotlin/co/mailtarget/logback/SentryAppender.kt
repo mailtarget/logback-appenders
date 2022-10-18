@@ -37,18 +37,18 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
         val host = InetAddress.getLocalHost()
 
-        val event = SentryEvent().also { event ->
-            event.message = Message().also {
-                it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+        if (evt.level == Level.ERROR || evt.level == Level.WARN) {
+            val event = SentryEvent().also { event ->
+                event.message = Message().also {
+                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+                }
+                event.level = when (evt.level) {
+                    Level.ERROR -> SentryLevel.ERROR
+                    Level.WARN -> SentryLevel.WARNING
+                    else -> SentryLevel.INFO
+                }
             }
-            event.level = when (evt.level) {
-                Level.INFO -> SentryLevel.INFO
-                Level.ERROR -> SentryLevel.ERROR
-                Level.DEBUG -> SentryLevel.DEBUG
-                Level.WARN -> SentryLevel.WARNING
-                else -> SentryLevel.INFO
-            }
+            Sentry.captureEvent(event)
         }
-        Sentry.captureEvent(event)
     }
 }
