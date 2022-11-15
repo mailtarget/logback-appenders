@@ -43,9 +43,6 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                 event.message = Message().also {
                     it.message = "${evt.message}\n[${host.hostName}/${host.hostAddress}][${evt.loggerName}]"
                 }
-                event.exceptions = listOf(
-                    SentryException().also { it.value = evt.message }
-                )
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
                     Level.WARN -> SentryLevel.WARNING
