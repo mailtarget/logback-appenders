@@ -8,6 +8,7 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
+import io.sentry.protocol.SentryException
 import java.net.InetAddress
 
 
@@ -40,8 +41,11 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
-                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+                    it.message = "${evt.message}\n[${host.hostName}/${host.hostAddress}][${evt.loggerName}]"
                 }
+                event.exceptions = listOf(
+                    SentryException().also { it.value = evt.message }
+                )
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
                     Level.WARN -> SentryLevel.WARNING
