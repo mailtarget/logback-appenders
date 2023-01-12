@@ -47,6 +47,8 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                     Level.WARN -> SentryLevel.WARNING
                     else -> SentryLevel.INFO
                 }
+                event.logger = SentryAppender::class.java.name
+                event.throwable = Throwable(evt.message)
             }
             Sentry.captureEvent(event)
         }
