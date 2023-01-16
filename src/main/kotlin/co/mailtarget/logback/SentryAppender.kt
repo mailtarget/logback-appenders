@@ -8,10 +8,13 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
+import io.sentry.protocol.SentryException
+import io.sentry.protocol.SentryStackTrace
 import java.net.InetAddress
 
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
+    var serviceName: String? = ""
 
     init {
         Sentry.init { options: SentryOptions ->
@@ -36,11 +39,13 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     fun sendMessage(evt: ILoggingEvent) {
 
         val host = InetAddress.getLocalHost()
+        if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
-                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+//                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+                    it.message = evt.message
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
@@ -48,7 +53,8 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                     else -> SentryLevel.INFO
                 }
                 event.logger = SentryAppender::class.java.name
-                event.throwable = Throwable(evt.message)
+                event.fingerprints = listOf(evt.loggerName, evt.message)
+                event.serverName = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]"
             }
             Sentry.captureEvent(event)
         }
