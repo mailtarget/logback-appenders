@@ -45,7 +45,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
 //                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
-                    it.message = evt.message
+                    it.message = "[$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
@@ -54,7 +54,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                 }
                 event.logger = SentryAppender::class.java.name
                 event.fingerprints = listOf(evt.loggerName, evt.message)
-                event.serverName = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]"
+                event.serverName = "${host.hostName}/${host.hostAddress}"
             }
             Sentry.captureEvent(event)
         }
