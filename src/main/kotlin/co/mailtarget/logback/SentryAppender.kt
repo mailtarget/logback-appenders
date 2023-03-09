@@ -15,6 +15,7 @@ import java.net.InetAddress
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
+    var errorCode: Int? = 0
 
     init {
         Sentry.init { options: SentryOptions ->
@@ -40,6 +41,9 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
         val host = InetAddress.getLocalHost()
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
+        println("errorrrrr $errorCode")
+        if (errorCode == null) errorCode = 123
+        println("errorrrrr $errorCode")
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
