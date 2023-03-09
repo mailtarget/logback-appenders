@@ -49,7 +49,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
 //                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
-                    it.message = "[$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
+                    it.message = "$errorCode [$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
