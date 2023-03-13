@@ -3,19 +3,18 @@ package co.mailtarget.logback
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.UnsynchronizedAppenderBase
+import co.mtarget.vesko.EntityNotFoundException
+import co.mtarget.vesko.NotAllowedException
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
-import io.sentry.protocol.SentryException
-import io.sentry.protocol.SentryStackTrace
 import java.net.InetAddress
 
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
-    var errorCode: Int? = 0
 
     init {
         Sentry.init { options: SentryOptions ->
@@ -25,6 +24,20 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             options.tracesSampleRate = 1.0
             // When first trying Sentry it's good to see what the SDK is doing:
             options.isDebug = true
+//            options.addIgnoredExceptionForType(EntityNotFoundException::class.java) // add EntityNotFoundException, NotAllowedException
+//            options.addIgnoredExceptionForType(NotAllowedException::class.java) // add EntityNotFoundException, NotAllowedException
+            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
+                when (event.throwable) {
+                    is EntityNotFoundException -> null
+                    is NotAllowedException -> null
+                    else -> event
+                }
+
+//                if (event.throwable is EntityNotFoundException) { // add EntityNotFoundException, NotAllowedException
+//                    null
+//                }
+//                event
+            }
         }
     }
 
@@ -41,9 +54,6 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
         val host = InetAddress.getLocalHost()
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
-        println("errorrrrr $errorCode")
-        if (errorCode == null) errorCode = 123
-        println("errorrrrr $errorCode")
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
@@ -56,7 +66,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                     Level.WARN -> SentryLevel.WARNING
                     else -> SentryLevel.INFO
                 }
-                event.logger = SentryAppender::class.java.name
+                event.logger = evt.loggerName
                 event.fingerprints = listOf(evt.loggerName, evt.message)
                 event.serverName = "${host.hostName}/${host.hostAddress}"
             }
