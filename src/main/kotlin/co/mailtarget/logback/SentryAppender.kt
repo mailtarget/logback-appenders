@@ -1,10 +1,10 @@
 package co.mailtarget.logback
 
-import ch.qos.logback.access.spi.AccessEvent
-import ch.qos.logback.access.spi.IAccessEvent
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.UnsynchronizedAppenderBase
+import co.mtarget.vesko.EntityNotFoundException
+import co.mtarget.vesko.NotAllowedException
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryLevel
@@ -13,9 +13,8 @@ import io.sentry.protocol.Message
 import java.net.InetAddress
 
 
-class SentryAppender : UnsynchronizedAppenderBase<Any>() {
+class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
-    var errorCode: Int? = 0
 
     init {
         Sentry.init { options: SentryOptions ->
@@ -25,13 +24,26 @@ class SentryAppender : UnsynchronizedAppenderBase<Any>() {
             options.tracesSampleRate = 1.0
             // When first trying Sentry it's good to see what the SDK is doing:
             options.isDebug = true
+//            options.addIgnoredExceptionForType(EntityNotFoundException::class.java) // add EntityNotFoundException, NotAllowedException
+//            options.addIgnoredExceptionForType(NotAllowedException::class.java) // add EntityNotFoundException, NotAllowedException
+            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
+                when (event.throwable) {
+                    is EntityNotFoundException -> null
+                    is NotAllowedException -> null
+                    else -> event
+                }
+
+//                if (event.throwable is EntityNotFoundException) { // add EntityNotFoundException, NotAllowedException
+//                    null
+//                }
+//                event
+            }
         }
     }
 
-    override fun append(evt: Any) {
+    override fun append(evt: ILoggingEvent) {
         try {
-
-//            sendMessage(evt)
+            sendMessage(evt)
         } catch (ex: Exception) {
             ex.printStackTrace()
             addError("Error posting log to Sentry : $evt", ex)
@@ -42,9 +54,6 @@ class SentryAppender : UnsynchronizedAppenderBase<Any>() {
 
         val host = InetAddress.getLocalHost()
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
-        println("errorrrrr $errorCode")
-        if (errorCode == null) errorCode = 123
-        println("errorrrrr $errorCode")
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
@@ -57,7 +66,7 @@ class SentryAppender : UnsynchronizedAppenderBase<Any>() {
                     Level.WARN -> SentryLevel.WARNING
                     else -> SentryLevel.INFO
                 }
-                event.logger = SentryAppender::class.java.name
+                event.logger = evt.loggerName
                 event.fingerprints = listOf(evt.loggerName, evt.message)
                 event.serverName = "${host.hostName}/${host.hostAddress}"
             }

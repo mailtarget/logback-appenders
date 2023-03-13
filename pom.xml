@@ -34,7 +34,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.3.70</kotlin.version>
-        <logback.version>1.4.5</logback.version>
+        <logback.version>1.2.1</logback.version>
         <junit.version>4.12</junit.version>
         <jackson-databind.version>2.9.7</jackson-databind.version>
         <java.version>1.8</java.version>
@@ -63,9 +63,9 @@
             <version>${logback.version}</version>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-access</artifactId>
-            <version>${logback.version}</version>
+            <groupId>co.mtarget</groupId>
+            <artifactId>vesko-core</artifactId>
+            <version>0.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
