@@ -13,6 +13,7 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Build Logback Appenders'
+        copyArtifacts(projectName: 'vesko/v.008');
         sh 'mvn clean install -DskipTest -Dgpg.skip'
       }
     }
