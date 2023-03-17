@@ -26,13 +26,13 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             options.isDebug = true
 //            options.addIgnoredExceptionForType(EntityNotFoundException::class.java) // add EntityNotFoundException, NotAllowedException
 //            options.addIgnoredExceptionForType(NotAllowedException::class.java) // add EntityNotFoundException, NotAllowedException
-//            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
-//                when (event.throwable) {
-//                    is EntityNotFoundException -> null
-//                    is NotAllowedException -> null
-//                    else -> event
-//                }
-//            }
+            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
+                when (event.throwable) {
+                    is EntityNotFoundException -> null
+                    is NotAllowedException -> null
+                    else -> event
+                }
+            }
         }
     }
 
