@@ -8,17 +8,16 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
-import io.sentry.protocol.SentryException
-import io.sentry.protocol.SentryStackTrace
 import java.net.InetAddress
 
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
+    var webhookUri: String? = null
 
     init {
         Sentry.init { options: SentryOptions ->
-            options.dsn = "https://085b748ec3f3491aa2c90a3f5c139d4a@o596696.ingest.sentry.io/4503996860203008"
+            options.dsn = webhookUri!!
             // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
             // We recommend adjusting this value in production.
             options.tracesSampleRate = 1.0
@@ -37,7 +36,6 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     }
 
     fun sendMessage(evt: ILoggingEvent) {
-
         val host = InetAddress.getLocalHost()
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
 
