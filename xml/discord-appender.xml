@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="DISCORD" class="co.mailtarget.activity.service.DiscordAppender">
+    <appender name="DISCORD" class="co.mtarget.logback.DiscordAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
