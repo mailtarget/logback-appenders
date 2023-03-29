@@ -3,8 +3,6 @@ package co.mailtarget.logback
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.UnsynchronizedAppenderBase
-import co.mtarget.vesko.EntityNotFoundException
-import co.mtarget.vesko.NotAllowedException
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryLevel
@@ -26,13 +24,14 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             options.isDebug = true
 //            options.addIgnoredExceptionForType(EntityNotFoundException::class.java) // add EntityNotFoundException, NotAllowedException
 //            options.addIgnoredExceptionForType(NotAllowedException::class.java) // add EntityNotFoundException, NotAllowedException
-//            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
-//                when (event.throwable) {
-//                    is EntityNotFoundException -> null
-//                    is NotAllowedException -> null
-//                    else -> event
-//                }
-//            }
+            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
+                if (event.throwable?.stackTrace?.get(0).toString().contains("Request not allowed")) return@BeforeSendCallback null
+                when (event.throwable?.stackTrace?.get(0)!!::class.simpleName) {
+                    "EntityNotFoundException" -> null
+                    "NotAllowedException" -> null
+                    else -> event
+                }
+            }
         }
     }
 
@@ -51,10 +50,12 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
+            if (evt.message.contains("not found or deleted")) return
+
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
 //                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
-                    it.message = "[$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
+                    it.message = "[$serviceName][${evt.loggerName}] ${evt.message}"
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
