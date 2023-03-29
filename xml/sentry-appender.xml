@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <appender name="SENTRY" class="co.mailtarget.logback.SentryAppender">
+    <appender name="SENTRY" class="co.mtarget.logback.SentryAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
