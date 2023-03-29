@@ -13,7 +13,7 @@ import java.net.InetAddress
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
-    var webhookUri: String? = null
+    var webhookUri: String? = ""
 
     init {
         Sentry.init { options: SentryOptions ->
