@@ -1,4 +1,4 @@
-package co.mailtarget.logback
+package co.mtarget.logback
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.LoggingEvent

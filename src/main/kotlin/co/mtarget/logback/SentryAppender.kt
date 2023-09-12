@@ -1,4 +1,4 @@
-package co.mailtarget.logback
+package co.mtarget.logback
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
@@ -12,10 +12,12 @@ import java.net.InetAddress
 
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
+    var serviceName: String? = ""
+    var webhookUri: String? = ""
 
     init {
         Sentry.init { options: SentryOptions ->
-            options.dsn = "https://085b748ec3f3491aa2c90a3f5c139d4a@o596696.ingest.sentry.io/4503996860203008"
+            options.dsn = webhookUri!!
             // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
             // We recommend adjusting this value in production.
             options.tracesSampleRate = 1.0
@@ -34,19 +36,23 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     }
 
     fun sendMessage(evt: ILoggingEvent) {
-
         val host = InetAddress.getLocalHost()
+        if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
-                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+//                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
+                    it.message = "[$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
                     Level.WARN -> SentryLevel.WARNING
                     else -> SentryLevel.INFO
                 }
+                event.logger = SentryAppender::class.java.name
+                event.fingerprints = listOf(evt.loggerName, evt.message)
+                event.serverName = "${host.hostName}/${host.hostAddress}"
             }
             Sentry.captureEvent(event)
         }
