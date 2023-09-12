@@ -1,4 +1,4 @@
-package co.mailtarget.logback.util
+package co.mtarget.logback.util
 
 import java.io.IOException
 import java.net.HttpURLConnection

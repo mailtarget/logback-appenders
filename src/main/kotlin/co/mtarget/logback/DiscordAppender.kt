@@ -1,4 +1,4 @@
-package co.mailtarget.logback
+package co.mtarget.logback
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Layout
@@ -87,7 +87,6 @@ class DiscordAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     }
 
     companion object {
-        private val API_URL = "https://discord.com/api/webhooks/781349063995293696/KRLlVFnvP6jWDJjo-0yUvH06YrWc2Vqji-OsVPILj7CVsjVgXUjoIbZvXPPgIfHFfjBD"
         private val defaultLayout: Layout<ILoggingEvent> = object : LayoutBase<ILoggingEvent>() {
             override fun doLayout(event: ILoggingEvent): String {
                 return "-- [" + event.level + "]" +

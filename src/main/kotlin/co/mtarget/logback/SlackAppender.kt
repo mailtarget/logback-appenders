@@ -1,10 +1,10 @@
-package co.mailtarget.logback
+package co.mtarget.logback
 
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Layout
 import ch.qos.logback.core.LayoutBase
 import ch.qos.logback.core.UnsynchronizedAppenderBase
-import co.mailtarget.logback.util.HttpUtil
+import co.mtarget.logback.util.HttpUtil
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.IOException
 import java.io.StringWriter
