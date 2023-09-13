@@ -2,6 +2,7 @@ package co.mtarget.logback
 
 import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.Layout
 import ch.qos.logback.core.UnsynchronizedAppenderBase
 import io.sentry.Sentry
 import io.sentry.SentryEvent
@@ -10,18 +11,15 @@ import io.sentry.SentryOptions
 import io.sentry.protocol.Message
 import java.net.InetAddress
 
-
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
     var webhookUri: String? = ""
+    var layout: Layout<ILoggingEvent>? = null
 
     init {
         Sentry.init { options: SentryOptions ->
             options.dsn = webhookUri!!
-            // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-            // We recommend adjusting this value in production.
             options.tracesSampleRate = 1.0
-            // When first trying Sentry it's good to see what the SDK is doing:
             options.isDebug = true
         }
     }
@@ -39,11 +37,12 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         val host = InetAddress.getLocalHost()
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
 
+        val formattedMessage = layout?.doLayout(evt) ?: evt.formattedMessage
+
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
-//                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
-                    it.message = "[$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
+                    it.message = "[$serviceName][${evt.loggerName}] $formattedMessage"
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
