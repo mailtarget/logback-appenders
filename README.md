@@ -18,9 +18,9 @@ Usage
 add this project as dependency of your project
 
 	    <dependency>
-            <groupId>co.mailtarget</groupId>
+            <groupId>co.mtarget</groupId>
             <artifactId>logback-appenders</artifactId>
-            <version>0.0.4</version>
+            <version>1.0.1</version>
         </dependency>
 
 
