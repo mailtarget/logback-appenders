@@ -4,7 +4,7 @@
 
     <groupId>co.mtarget</groupId>
     <artifactId>logback-appenders</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <name>co.mtarget:logback-appenders</name>
     <description>Collections of custom appenders utility to distribute logback's event.</description>
@@ -21,7 +21,7 @@
         <connection>scm:git:https://github.com/mailtarget/logback-appenders</connection>
         <developerConnection>scm:git:https://github.com/mailtarget/logback-appenders</developerConnection>
         <url>https://github.com/mailtarget/logback-appenders</url>
-        <tag>v.1.0.0</tag>
+        <tag>v.1.0.1</tag>
     </scm>
 
     <developers>

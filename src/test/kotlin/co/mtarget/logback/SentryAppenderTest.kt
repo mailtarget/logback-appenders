@@ -12,25 +12,7 @@ class SentryAppenderTest {
     fun `should send message`() {
         val event = LoggingEvent()
         event.message = """
-            [EventbusGenerator] Exception non-ITX, details:
-            targetInstance: co.mailtarget.form.service.FormService
-            function: getPublicForm
-            returnType: co.mailtarget.form.dto.FormDetail
-            result: null
-            stacktrace: invalid hexadecimal representation of an ObjectId: [sitemap.xml]
-            org.bson.types.ObjectId.parseHexString(ObjectId.java:550)
-            org.bson.types.ObjectId.<init>(ObjectId.java:240)
-            co.mailtarget.form.service.FormService.getPublicForm(FormService.kt:783)
-            sun.reflect.GeneratedMethodAccessor125.invoke(Unknown Source)
-            sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
-            java.lang.reflect.Method.invoke(Method.java:498)
-            io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java:164)
-            io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:469)
-            io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:503)
-            io.netty.util.concurrent.SingleThreadEventExecutor${'$'}4.run(SingleThreadEventExecutor.java:986)
-            io.netty.util.internal.ThreadExecutorMap${'$'}2.run(ThreadExecutorMap.java:74)
-            io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
-            java.lang.Thread.run(Thread.java:748)
+            test
         """.trimIndent()
         event.level = Level.ERROR
         event.loggerName = "form-service-855bbc7bfd-gl4ll"

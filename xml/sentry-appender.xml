@@ -7,9 +7,9 @@
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <webhookUri>{your-webhook-url}</webhookUri>
-        <serverName>{your-server-address}</serverName>
-        <serviceName>{your-service-name}</serviceName>
+        <webhookUri>"https://1966434c409b06a054992f1590640507@o596696.ingest.sentry.io/4506577322377216"</webhookUri>
+        <serverName>"{your-server-address}"</serverName>
+        <serviceName>"{your-service-name}"</serviceName>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%d{yyyy-MM-dd HH:mm:ss} [%level] %logger{32} - %msg%n</pattern>
         </layout>

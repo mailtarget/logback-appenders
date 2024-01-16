@@ -16,16 +16,13 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var webhookUri: String? = ""
     var layout: Layout<ILoggingEvent>? = null
 
-    init {
-        Sentry.init { options: SentryOptions ->
-            options.dsn = webhookUri!!
-            options.tracesSampleRate = 1.0
-            options.isDebug = true
-        }
-    }
-
     override fun append(evt: ILoggingEvent) {
         try {
+            Sentry.init { options: SentryOptions ->
+                options.dsn = webhookUri!!
+                options.tracesSampleRate = 1.0
+                options.isDebug = true
+            }
             sendMessage(evt)
         } catch (ex: Exception) {
             ex.printStackTrace()
