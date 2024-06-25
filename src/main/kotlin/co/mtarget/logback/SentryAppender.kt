@@ -16,13 +16,20 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var webhookUri: String? = ""
     var layout: Layout<ILoggingEvent>? = null
 
+    override fun start() {
+        val host = InetAddress.getLocalHost()
+        Sentry.init { options: SentryOptions ->
+            options.dsn = webhookUri!!
+            options.tracesSampleRate = 1.0
+            options.isDebug = true
+            options.serverName = "[$serviceName] ${host.hostName}/${host.hostAddress}"
+            options.isEnableDeduplication = false
+        }
+        super.start()
+    }
+
     override fun append(evt: ILoggingEvent) {
         try {
-            Sentry.init { options: SentryOptions ->
-                options.dsn = webhookUri!!
-                options.tracesSampleRate = 1.0
-                options.isDebug = true
-            }
             sendMessage(evt)
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -32,7 +39,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
     fun sendMessage(evt: ILoggingEvent) {
         val host = InetAddress.getLocalHost()
-        if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
+        if (serviceName.isNullOrEmpty()) serviceName = "${host.hostName}/${host.hostAddress}"+evt.loggerName
 
         val formattedMessage = layout?.doLayout(evt) ?: evt.formattedMessage
 
