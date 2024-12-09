@@ -28,7 +28,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         }
         Sentry.setExtra("service_name", serviceName ?: "unknown")
         Sentry.setExtra("service_address", host.hostAddress ?: "unknown")
-        Sentry.setExtra("datetime", Date().toString())
+        Sentry.setExtra("event_date", Date().toString())
         super.start()
     }
 
@@ -43,7 +43,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
 
     fun sendMessage(evt: ILoggingEvent) {
         val host = InetAddress.getLocalHost()
-        Sentry.setExtra("logger", evt.loggerName)
+        Sentry.setExtra("logger_name", evt.loggerName)
         if (serviceName.isNullOrEmpty()) serviceName = "${host.hostName}/${host.hostAddress}"+evt.loggerName
 
         val formattedMessage = layout?.doLayout(evt) ?: evt.formattedMessage
