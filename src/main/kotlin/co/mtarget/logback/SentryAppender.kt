@@ -9,6 +9,7 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
+import org.slf4j.MDC
 import java.net.InetAddress
 import java.util.Date
 
@@ -44,6 +45,13 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     fun sendMessage(evt: ILoggingEvent) {
         val host = InetAddress.getLocalHost()
         Sentry.setExtra("logger_name", evt.loggerName)
+        val mdcProperties = evt.mdcPropertyMap
+//        val mdcProperties = evt.argumentArray
+        if (!mdcProperties.isEmpty()) {
+            mdcProperties.forEach { item ->
+                Sentry.setExtra(item.key, item.value)
+            }
+        }
         if (serviceName.isNullOrEmpty()) serviceName = "${host.hostName}/${host.hostAddress}"+evt.loggerName
 
         val formattedMessage = layout?.doLayout(evt) ?: evt.formattedMessage
@@ -63,6 +71,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                 event.serverName = "${host.hostName}/${host.hostAddress}"
             }
             Sentry.captureEvent(event)
+            MDC.clear()
         }
     }
 }
