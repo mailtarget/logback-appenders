@@ -8,8 +8,6 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
-import io.sentry.protocol.SentryException
-import io.sentry.protocol.SentryStackTrace
 import java.net.InetAddress
 
 
@@ -24,6 +22,14 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             options.tracesSampleRate = 1.0
             // When first trying Sentry it's good to see what the SDK is doing:
             options.isDebug = true
+            options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
+                val statusCode = event.contexts.response?.statusCode
+                if (statusCode != null && statusCode in 400..499) {
+                    null
+                } else {
+                    event
+                }
+            }
         }
     }
 
@@ -45,14 +51,14 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
 //                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
-                    it.message = "[$serviceName][${evt.loggerName}] ${evt.formattedMessage}"
+                    it.message = "[$serviceName][${evt.loggerName}] ${evt.message}"
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
                     Level.WARN -> SentryLevel.WARNING
                     else -> SentryLevel.INFO
                 }
-                event.logger = SentryAppender::class.java.name
+                event.logger = evt.loggerName
                 event.fingerprints = listOf(evt.loggerName, evt.message)
                 event.serverName = "${host.hostName}/${host.hostAddress}"
             }
