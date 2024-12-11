@@ -22,14 +22,12 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             options.tracesSampleRate = 1.0
             // When first trying Sentry it's good to see what the SDK is doing:
             options.isDebug = true
-//            options.addIgnoredExceptionForType(EntityNotFoundException::class.java) // add EntityNotFoundException, NotAllowedException
-//            options.addIgnoredExceptionForType(NotAllowedException::class.java) // add EntityNotFoundException, NotAllowedException
             options.beforeSend = SentryOptions.BeforeSendCallback { event, hint ->
-                if (event.throwable?.stackTrace?.get(0).toString().contains("Request not allowed")) return@BeforeSendCallback null
-                when (event.throwable?.stackTrace?.get(0)!!::class.simpleName) {
-                    "EntityNotFoundException" -> null
-                    "NotAllowedException" -> null
-                    else -> event
+                val statusCode = event.contexts.response?.statusCode
+                if (statusCode != null && statusCode in 400..499) {
+                    null
+                } else {
+                    event
                 }
             }
         }
@@ -50,8 +48,6 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         if (serviceName.isNullOrEmpty()) serviceName = evt.loggerName
 
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
-            if (evt.message.contains("not found or deleted")) return
-
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
 //                    it.message = "[${host.hostName}/${host.hostAddress}][${evt.loggerName}]\n${evt.message}"
