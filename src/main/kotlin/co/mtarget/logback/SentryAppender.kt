@@ -9,7 +9,9 @@ import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.SentryOptions
 import io.sentry.protocol.Message
+import org.slf4j.MDC
 import java.net.InetAddress
+import java.util.Date
 
 class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
     var serviceName: String? = ""
@@ -21,10 +23,12 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         Sentry.init { options: SentryOptions ->
             options.dsn = webhookUri!!
             options.tracesSampleRate = 1.0
-            options.isDebug = true
+            options.isDebug = false
             options.serverName = "[$serviceName] ${host.hostName}/${host.hostAddress}"
             options.isEnableDeduplication = false
         }
+        Sentry.setExtra("service_name", serviceName ?: "unknown")
+        Sentry.setExtra("service_address", host.hostAddress ?: "unknown")
         super.start()
     }
 
@@ -33,12 +37,21 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
             sendMessage(evt)
         } catch (ex: Exception) {
             ex.printStackTrace()
-            addError("Error posting log to Sentry : $evt", ex)
+            addWarn("Error posting log to Sentry : $evt")
         }
     }
 
     fun sendMessage(evt: ILoggingEvent) {
         val host = InetAddress.getLocalHost()
+        Sentry.setExtra("logger_name", evt.loggerName)
+        Sentry.setExtra("event_date", Date().toString())
+        val mdcProperties = evt.mdcPropertyMap
+//        val mdcProperties = evt.argumentArray
+        if (!mdcProperties.isEmpty()) {
+            mdcProperties.forEach { item ->
+                Sentry.setExtra(item.key, item.value)
+            }
+        }
         if (serviceName.isNullOrEmpty()) serviceName = "${host.hostName}/${host.hostAddress}"+evt.loggerName
 
         val formattedMessage = layout?.doLayout(evt) ?: evt.formattedMessage
@@ -46,7 +59,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
         if (evt.level == Level.ERROR || evt.level == Level.WARN) {
             val event = SentryEvent().also { event ->
                 event.message = Message().also {
-                    it.message = "[$serviceName][${evt.loggerName}] $formattedMessage"
+                    it.message = formattedMessage
                 }
                 event.level = when (evt.level) {
                     Level.ERROR -> SentryLevel.ERROR
@@ -58,6 +71,7 @@ class SentryAppender : UnsynchronizedAppenderBase<ILoggingEvent>() {
                 event.serverName = "${host.hostName}/${host.hostAddress}"
             }
             Sentry.captureEvent(event)
+            MDC.clear()
         }
     }
 }
