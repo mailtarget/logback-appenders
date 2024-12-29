@@ -25,3 +25,7 @@ add this project as dependency of your project
 
 
 to see configuration sample please take a look at "xml" folder above
+
+## Nexus Local
+- add settings.xml to ~/.m2
+- mvn deploy -DskipTests -Dmaven.install.skip=true -Dgpg.skip

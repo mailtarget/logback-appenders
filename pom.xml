@@ -263,6 +263,13 @@
     </build>
 
     <distributionManagement>
+        <repository>
+            <id>nexus-local</id>
+            <url>https://nexus.lab.mtarget.dev/repository/maven-releases/</url>
+        </repository>
+    </distributionManagement>
+
+    <!--<distributionManagement>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>
             <name>Sonatype Nexus snapshot repository</name>
@@ -273,7 +280,7 @@
             <name>Sonatype Nexus release repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-    </distributionManagement>
+    </distributionManagement>-->
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
